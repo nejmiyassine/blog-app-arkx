@@ -5,8 +5,15 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+// const session = require('express-session');
+// const store = new session.MemoryStore();
 
 const app = express();
+
+// Import Routers
+const router = require('./routers/index');
+const userRouter = require('./routers/userRouter');
+const blogRouter = require('./routers/blogRouter');
 
 // ---------- DB ----------
 const db = require('./config/keys').MongoURI;
@@ -15,15 +22,24 @@ const db = require('./config/keys').MongoURI;
 mongoose
     .connect(db, {
         useNewUrlParser: true,
+        useUnifiedTopology: true,
     })
     .then(() => console.log('MongoDB connected ....'))
     .catch((err) => console.log(err));
 
-// Import Routers
-const router = require('./routers/index');
-const userRouter = require('./routers/userRouter');
-
 const PORT = process.env.PORT || 8000;
+
+/*
+app.use(
+    session({
+        secret: 'f4z4gs$Gcg',
+        cookie: { maxAge: 300000000, secure: false },
+        saveUnitialized: true,
+        resave: false,
+        store,
+    })
+);
+*/
 
 // ---------- Middlewares ----------
 app.use(express.json());
@@ -40,6 +56,7 @@ app.use(express.static(path.join(__dirname, '/public')));
 // ---------- Routers ----------
 app.use('/', router);
 app.use('/users', userRouter);
+app.use('/blogs', blogRouter);
 
 app.listen(PORT, () => {
     console.log(`Server listening on port http://localhost:${PORT}`);
