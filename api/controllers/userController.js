@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const secretKey = require('../config/keys').secretKey;
 
@@ -22,9 +23,11 @@ exports.registerUser = async (req, res) => {
         const token = jwt.sign({ userId: savedUser._id }, secretKey, {
             expiresIn: '1h',
         });
+
         res.json({ token });
+
         // Redirect to welcome page
-        res.redirect('/');
+        // res.redirect('/');
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ error: 'Registration failed' });
@@ -36,9 +39,7 @@ exports.loginUser = (req, res, next) => {
         if (err) return res.status(500).json({ error: 'Login failed' });
 
         if (!user) {
-            return res
-                .status(401)
-                .json({ error: 'Invalid username or password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         // Generate a JWT token

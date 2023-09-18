@@ -1,5 +1,6 @@
-const blogHelpers = require('../helpers/blogHelpers');
 const multer = require('multer');
+
+const Blog = require('../models/Blog');
 
 // Image Upload
 const storage = multer.diskStorage({
@@ -7,7 +8,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, file.filename + '_' + Date.now() + '_' + file.originalname);
+        cb(null, file.fieldname + '_' + Date.now() + '_' + file.originalname);
     },
 });
 
@@ -20,8 +21,8 @@ exports.upload = multer({
 
 exports.getAllBlogs = async (req, res) => {
     try {
-        const blogs = await blogHelpers.getAllBlogs();
-        res.json({ data: blogs, status: 'success' });
+        const blogs = await Blog.find();
+        res.json({ data: blogs });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -30,7 +31,8 @@ exports.getAllBlogs = async (req, res) => {
 exports.createBlog = async (req, res) => {
     try {
         const { title, description, category } = req.body;
-        const image = req.file.path;
+        const image = req.file ? req.file.path : '';
+        const userId = req.user._id;
 
         const newBlog = new Blog({
             title,
@@ -38,12 +40,11 @@ exports.createBlog = async (req, res) => {
             image,
             category,
             createdAt: Date.now(),
+            user: userId,
         });
 
-        const blog = await blogHelpers.createBlog(newBlog);
-        const savedBlog = blog.save();
-
-        res.status(201).json(savedBlog);
+        const blog = await Blog.create(newBlog);
+        res.status(201).json(blog);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -51,11 +52,13 @@ exports.createBlog = async (req, res) => {
 
 exports.getBlogById = async (req, res) => {
     try {
-        const blog = await blogHelpers.getBlogById(req.params.id);
+        const blog = await Blog.findById(req.params.id);
+
         if (!blog) {
             res.status(404).json({ message: 'Blog Not found' });
         }
-        res.json(blog);
+
+        res.status(200).json(blog);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -75,7 +78,7 @@ exports.updateBlog = async (req, res) => {
             updatedFields.image = req.file.path;
         }
 
-        const updatedBlog = await blogHelpers.updateBlog(
+        const updatedBlog = await Blog.findByIdAndUpdate(
             req.params.id,
             updatedFields
         );
@@ -84,7 +87,7 @@ exports.updateBlog = async (req, res) => {
             return res.status(404).json({ message: 'Blog not found' });
         }
 
-        res.json(updatedBlog);
+        res.status(204).json(updatedBlog);
     } catch (error) {
         res.status(400).json({ error: err.message });
     }
@@ -92,11 +95,13 @@ exports.updateBlog = async (req, res) => {
 
 exports.deleteBlog = async (req, res) => {
     try {
-        const deletedBlog = await blogService.deleteBlog(req.params.id);
+        const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+
         if (!deletedBlog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-        res.json({ message: 'Blog deleted!' });
+
+        res.status(204).json({ message: 'Blog deleted successfully!' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
