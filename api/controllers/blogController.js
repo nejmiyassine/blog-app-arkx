@@ -5,7 +5,7 @@ const Blog = require('../models/Blog');
 // Image Upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+        cb(null, 'public/uploads/');
     },
     filename: (req, file, cb) => {
         cb(null, file.fieldname + '_' + Date.now() + '_' + file.originalname);
