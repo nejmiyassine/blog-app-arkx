@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { upload } = require('../controllers/blogController');
+const { upload } = require('../controllers/blog.controller');
 
 const {
     createBlog,
@@ -9,7 +9,7 @@ const {
     getBlogById,
     updateBlog,
     deleteBlog,
-} = require('../controllers/blogController');
+} = require('../controllers/blog.controller');
 
 router.get('/', getAllBlogs);
 router.get('/:id', getBlogById);

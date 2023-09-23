@@ -1,9 +1,8 @@
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-const secretKey = require('../config/keys').secretKey;
+const jwtHelper = require('../helpers/jwtHelper');
+const User = require('../models/User');
 
 exports.registerUser = async (req, res) => {
     const { username, email, password } = await req.body;
@@ -19,15 +18,18 @@ exports.registerUser = async (req, res) => {
             password: hashedPassword,
         });
 
-        const savedUser = await newUser.save();
-        const token = jwt.sign({ userId: savedUser._id }, secretKey, {
-            expiresIn: '1h',
-        });
+        await newUser
+            .save()
+            .then((user) => {
+                const jwt = jwtHelper.issueJWT(user);
+                const { token, expires } = jwt;
 
-        res.json({ token });
+                res.json({ user, token, expiresIn: expires });
+            })
+            .catch((err) => next(err));
 
         // Redirect to welcome page
-        // res.redirect('/');
+        res.redirect('/login');
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ error: 'Registration failed' });
@@ -36,20 +38,15 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = (req, res, next) => {
     passport.authenticate('local', { session: false }, (err, user) => {
-        if (err) return res.status(500).json({ error: 'Login failed' });
+        if (err) return res.status(500).json({ error: err.message });
 
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Generate a JWT token
-        const token = jwt.sign({ userId: user._id }, secretKey, {
-            expiresIn: '1h',
-        });
+        const jwt = jwtHelper.issueJWT(user);
+        const { token, expires } = jwt;
 
-        // Return the token or redirect to a welcome page
-        res.json({ token }); // This sends the token as a JSON response
-
-        // If you want to redirect, use res.redirect('/welcome') instead
+        res.json({ user, token, expiresIn: expires });
     })(req, res, next); // Don't forget to call the authenticate function
 };
