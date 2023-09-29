@@ -5,7 +5,7 @@ const jwtHelper = require('../helpers/jwtHelper');
 const User = require('../models/User');
 
 exports.registerUser = async (req, res) => {
-    const { username, email, password } = await req.body;
+    const { username, email, password } = req.body;
 
     try {
         const saltRound = 10;

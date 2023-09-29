@@ -1,11 +1,11 @@
 // Packages
 require('dotenv').config();
-
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const sessionStore = require('express-session').MemoryStore();
 const passport = require('passport');
+const cors = require('cors');
 const app = express();
 
 const connectDb = require('./config/database');
@@ -14,6 +14,11 @@ const connectDb = require('./config/database');
 connectDb();
 
 // ---------- Middlewares ----------
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Session Middleware
@@ -24,6 +29,7 @@ app.use(
         saveUninitialized: true,
         cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true },
         store: sessionStore,
+        sameSite: 'None',
     })
 );
 // Passport Middleware
@@ -43,11 +49,7 @@ const blogRouter = require('./routers/blog.router');
 
 // ---------- Routers ----------
 app.use('/users', userRouter);
-app.use('/blogs', authenticateJWT, blogRouter);
-
-app.get('/', (req, res) => {
-    res.render('welcome');
-});
+app.use('/blogs', blogRouter);
 
 const PORT = process.env.PORT || 8000;
 

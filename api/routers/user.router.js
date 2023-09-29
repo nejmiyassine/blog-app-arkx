@@ -1,19 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
+const passport = require('passport');
 
 const User = require('../models/User');
 const { registerUser, loginUser } = require('../controllers/user.controller');
 
 const validate = require('../helpers/validate');
-
-router.get('/login', (req, res) => {
-    res.render('login');
-});
-
-router.get('/register', (req, res) => {
-    res.render('register');
-});
 
 router.post(
     '/register',
@@ -57,6 +50,15 @@ router.post(
             .withMessage('Invalid email or password'),
     ]),
     loginUser
+);
+
+router.get(
+    '/verify',
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        console.log('Received token: ', req.user); // Log the received token
+        res.json({ user: req.user });
+    }
 );
 
 router.get('/logout', (req, res) => {
