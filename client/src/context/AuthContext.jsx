@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import { LOGIN, LOGOUT } from '../CONSTANTS/CONSTANT';
+import { LOGIN, REGISTER, LOGOUT } from '../CONSTANTS/CONSTANT';
 
 const apiUrl = import.meta.env.VITE_REACT_API_URL;
 
@@ -15,6 +15,8 @@ const authReducer = (state, action) => {
     switch (action.type) {
         case LOGIN:
             return { ...state, user: action.payload };
+        case REGISTER:
+            return { ...state, user: action.payload };
         case LOGOUT:
             return { ...state, user: null };
         default:
@@ -22,8 +24,10 @@ const authReducer = (state, action) => {
     }
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
+// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
     const queryClient = useQueryClient();
@@ -47,6 +51,20 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    const register = async (registrationData) => {
+        try {
+            const response = await axios.post(
+                `${apiUrl}/users/register`,
+                registrationData
+            );
+            Cookies.set('token', response.data.token);
+            dispatch({ type: REGISTER, payload: response.data.user });
+            console.log(response.data.user);
+        } catch (error) {
+            console.error('Registration Error:', error);
+        }
+    };
+
     const login = async (credentials) => {
         try {
             const response = await axios.post(
@@ -67,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ state, login, logout }}>
+        <AuthContext.Provider value={{ state, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

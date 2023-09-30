@@ -7,8 +7,7 @@ const UserSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     image: {
         type: String,
-        default:
-            'https://www.flaticon.com/free-icon/user_847969?term=profile+picture&page=1&position=11&origin=tag&related_id=847969',
+        default: 'https://cdn-icons-png.flaticon.com/512/847/847969.png',
     },
 });
 

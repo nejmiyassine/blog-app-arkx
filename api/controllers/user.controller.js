@@ -27,9 +27,6 @@ exports.registerUser = async (req, res) => {
                 res.json({ user, token, expiresIn: expires });
             })
             .catch((err) => next(err));
-
-        // Redirect to welcome page
-        res.redirect('/login');
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ error: 'Registration failed' });

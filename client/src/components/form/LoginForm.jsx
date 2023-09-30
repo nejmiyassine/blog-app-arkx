@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import Container from '../Container';
+import InputForm from '../InputForm';
 
 const LoginForm = () => {
     const { login } = useAuth();
@@ -11,7 +14,7 @@ const LoginForm = () => {
     const handleSubmitLogin = (e) => {
         e.preventDefault();
         login(credentials);
-        navigate('/blog');
+        navigate('/');
     };
 
     const handleInputChange = (e) => {
@@ -20,33 +23,40 @@ const LoginForm = () => {
     };
 
     return (
-        <div>
+        <Container>
             <h2>Login Form</h2>
             <form action='' onSubmit={handleSubmitLogin}>
-                <div>
-                    <label htmlFor='email'>Email:</label>
-                    <input
-                        type='text'
-                        id='email'
-                        name='email'
-                        placeholder='Enter your email'
-                        value={credentials.email}
-                        onChange={handleInputChange}
-                    />
+                <InputForm
+                    type='email'
+                    label='Email'
+                    id='email'
+                    name='email'
+                    placeholder='Enter your email'
+                    value={credentials.email}
+                    onChange={handleInputChange}
+                    required
+                />
+                <InputForm
+                    type='password'
+                    label='Password'
+                    id='password'
+                    name='password'
+                    placeholder='Enter your password'
+                    value={credentials.password}
+                    onChange={handleInputChange}
+                    required
+                />
+                <div className='btn'>
+                    <button type='submit'>Login</button>
                 </div>
                 <div>
-                    <label htmlFor='password'>Password:</label>
-                    <input
-                        type='password'
-                        id='password'
-                        name='password'
-                        placeholder='Enter your password'
-                        onChange={handleInputChange}
-                    />
+                    <p>
+                        Dont Have an account?
+                        <Link to='/register'>Create an account</Link>
+                    </p>
                 </div>
-                <button type='submit'>Login</button>
             </form>
-        </div>
+        </Container>
     );
 };
 

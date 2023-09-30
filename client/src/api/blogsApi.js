@@ -7,6 +7,11 @@ export const fetchBlogs = async () => {
     return response.data;
 };
 
+export const fetchBlogById = async (blogId) => {
+    const response = await axios.get(`${apiUrl}/blogs/${blogId}`);
+    return response.data;
+};
+
 export const createBlog = async (newBlogData) => {
     const response = await axios.post(`${apiUrl}/blogs`, newBlogData, {
         headers: { 'Content-Type': 'multipart/form-data' },

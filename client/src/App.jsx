@@ -1,28 +1,73 @@
-import { Link } from 'react-router-dom';
-import ToggleButton from './components/ToggleButton';
-import useTheme from './hooks/useTheme';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+
+import ErrorElement from './routes/ErrorPage.jsx';
+import RegisterForm from './components/form/RegisterForm.jsx';
+import LoginForm from './components/form/LoginForm.jsx';
+import BlogForm from './components/form/BlogForm.jsx';
+import Blogs from './components/Blogs.jsx';
+import Container from './components/Container';
+import Header from './components/Header';
+import BlogDetails from './pages/BlogDetails/BlogDetails';
+import MyBlogs from './components/MyBlogs';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
-    const { theme } = useTheme();
+    const { state } = useAuth();
 
     return (
-        <div className={` ${theme === 'dark' ? 'dark' : ''}`}>
-            <div className={`min-h-screen dark:text-white dark:bg-[#222]`}>
-                <ToggleButton />
-                <div className='container mx-auto '>
-                    <h2 className='font-bold text-2xl'>
-                        Hello Everyone: Our Theme is {theme}
-                    </h2>
-                    <nav>
-                        <ul>
-                            <li>
-                                <Link to='/login'>Login</Link>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
+        <BrowserRouter>
+            <Container>
+                <Header />
+                <Routes>
+                    <Route
+                        path='/'
+                        element={
+                            <ProtectedRoute>
+                                <Blogs />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/create-blog'
+                        element={
+                            <ProtectedRoute>
+                                <BlogForm />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/register'
+                        element={
+                            state.user ? <Navigate to='/' /> : <RegisterForm />
+                        }
+                    />
+                    <Route
+                        path='/login'
+                        element={
+                            state.user ? <Navigate to='/' /> : <LoginForm />
+                        }
+                    />
+                    <Route
+                        path='/blog/:id'
+                        element={
+                            <ProtectedRoute>
+                                <BlogDetails />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/my-blogs'
+                        element={
+                            <ProtectedRoute>
+                                <MyBlogs />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path='*' element={<ErrorElement />} />
+                </Routes>
+            </Container>
+        </BrowserRouter>
     );
 };
 

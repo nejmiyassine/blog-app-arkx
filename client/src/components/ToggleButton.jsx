@@ -7,7 +7,7 @@ const ToggleButton = () => {
 
     return (
         <button
-            className='rounded-full p-4 fixed bottom-8 right-8 bg-[#222] dark:bg-white'
+            className='rounded-full p-4 fixed bottom-8 right-8 bg-gray-400 dark:bg-white'
             onClick={toggleTheme}
         >
             {theme === 'light' ? (
