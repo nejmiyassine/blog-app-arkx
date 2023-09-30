@@ -5,7 +5,7 @@ const Blog = require('../models/Blog');
 // Image Upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+        cb(null, 'public/images');
     },
     filename: (req, file, cb) => {
         cb(null, file.fieldname + '_' + Date.now() + '_' + file.originalname);
@@ -17,14 +17,28 @@ exports.upload = multer({
     limits: {
         fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
     },
-}).single('image'); // 'image' reference to name of input
+}).single('image');
 
 exports.getAllBlogs = async (req, res) => {
     try {
         const blogs = await Blog.find();
-        res.json({ data: blogs });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.json(blogs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getBlogById = async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+
+        if (!blog) {
+            res.status(404).json({ message: 'Blog Not found' });
+        }
+
+        res.status(200).json(blog);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -45,22 +59,8 @@ exports.createBlog = async (req, res) => {
 
         const blog = await Blog.create(newBlog);
         res.status(201).json(blog);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
-};
-
-exports.getBlogById = async (req, res) => {
-    try {
-        const blog = await Blog.findById(req.params.id);
-
-        if (!blog) {
-            res.status(404).json({ message: 'Blog Not found' });
-        }
-
-        res.status(200).json(blog);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -89,7 +89,7 @@ exports.updateBlog = async (req, res) => {
 
         res.status(204).json(updatedBlog);
     } catch (error) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -102,7 +102,7 @@ exports.deleteBlog = async (req, res) => {
         }
 
         res.status(204).json({ message: 'Blog deleted successfully!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

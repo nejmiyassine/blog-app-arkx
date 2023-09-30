@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../context/AuthContext';
-
-import { fetchBlogs } from '../api/blogsApi';
 import { Link } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext';
+import { fetchBlogs } from '../api/blogsApi';
 
 const Blogs = () => {
     const { state } = useAuth();
@@ -11,27 +12,45 @@ const Blogs = () => {
         queryKey: ['blogs'],
         queryFn: fetchBlogs,
     });
-    const blogs = data?.data;
+
+    const basePath = 'http://localhost:8000';
+    const imageUrl = (imagePath) =>
+        `${basePath}/${imagePath.replace(/\\/g, '/')}`;
+
+    useEffect(() => {
+        fetchBlogs();
+    }, []);
 
     if (isLoading) return <p>Loading ...</p>;
+
     if (isError) return <p>{error.message}</p>;
 
     return state.user ? (
         <div className=''>
-            {blogs &&
-                blogs.map((blog) => (
-                    <div key={blog._id} className='py-4'>
+            {data &&
+                data.map((blog) => (
+                    <div key={blog._id} className='flex py-4 gap-10'>
                         <div>
-                            <img src={`${blog.image}`} alt={blog.title} />
+                            <img
+                                className='w-44'
+                                src={`${imageUrl(blog.image)}`}
+                                alt={blog.title}
+                            />
                         </div>
                         <div>
-                            <p>
-                                <Link to={`/blog/${blog._id}`}>
-                                    {blog.title}
-                                </Link>
-                            </p>
-                            <p>{blog.description}</p>
-                            <p>{blog.category}</p>
+                            <div>
+                                <h2 className='font-bold text-4xl pb-4 hover:underline hover:underline-offset-8'>
+                                    <Link to={`/blog/${blog._id}`}>
+                                        {blog.title}
+                                    </Link>
+                                </h2>
+                            </div>
+                            <div className='pb-4'>
+                                <p>{blog.description}</p>
+                            </div>
+                            <div>
+                                <span>{blog.category}</span>
+                            </div>
                         </div>
                     </div>
                 ))}

@@ -1,34 +1,86 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const apiUrl = import.meta.env.VITE_REACT_API_URL;
 
+const token = Cookies.get('token');
+
 export const fetchBlogs = async () => {
-    const response = await axios.get(`${apiUrl}/blogs`);
-    return response.data;
+    try {
+        const response = await axios.get(`${apiUrl}/blogs`, {
+            headers: {
+                Authorization: `${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.message);
+    }
 };
 
 export const fetchBlogById = async (blogId) => {
-    const response = await axios.get(`${apiUrl}/blogs/${blogId}`);
+    try {
+        const response = await axios.get(`${apiUrl}/blogs/${blogId}`, {
+            headers: {
+                Authorization: `${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.message);
+    }
+};
+
+export const fetchUserBlogs = async (userId) => {
+    const response = await axios.get(`${apiUrl}/users/${userId}/blogs`, {
+        headers: {
+            Authorization: `${token}`,
+        },
+    });
     return response.data;
 };
 
 export const createBlog = async (newBlogData) => {
-    const response = await axios.post(`${apiUrl}/blogs`, newBlogData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
-
-    return response.data;
+    try {
+        const response = await axios.post(`${apiUrl}/blogs`, newBlogData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.message);
+    }
 };
 
 export const updateBlog = async (blogId, updatedBlogData) => {
-    const response = await axios.put(
-        `${apiUrl}/blogs/${blogId}`,
-        updatedBlogData
-    );
-    return response.data;
+    try {
+        console.log(blogId, updatedBlogData);
+        const response = await axios.put(
+            `${apiUrl}/blogs/${blogId}`,
+            updatedBlogData,
+            {
+                headers: {
+                    Authorization: `${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error.message);
+    }
 };
 
 export const deleteBlog = async (blogId) => {
-    const response = await axios.delete(`blogs/${blogId}`);
-    return response.data;
+    try {
+        const response = await axios.delete(`${apiUrl}/blogs/${blogId}`, {
+            headers: {
+                Authorization: `${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error.message);
+    }
 };

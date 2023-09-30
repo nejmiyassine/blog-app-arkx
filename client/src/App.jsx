@@ -4,12 +4,13 @@ import { useAuth } from './context/AuthContext';
 import ErrorElement from './routes/ErrorPage.jsx';
 import RegisterForm from './components/form/RegisterForm.jsx';
 import LoginForm from './components/form/LoginForm.jsx';
-import BlogForm from './components/form/BlogForm.jsx';
-import Blogs from './components/Blogs.jsx';
 import Container from './components/Container';
 import Header from './components/Header';
+import Blogs from './components/Blogs.jsx';
 import BlogDetails from './pages/BlogDetails/BlogDetails';
 import MyBlogs from './components/MyBlogs';
+import CreateBlog from './pages/CreateBlog/CreateBlog';
+import EditBlog from './pages/EditBlog/EditBlog';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
@@ -32,7 +33,15 @@ const App = () => {
                         path='/create-blog'
                         element={
                             <ProtectedRoute>
-                                <BlogForm />
+                                <CreateBlog />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/edit-blog/:blogId'
+                        element={
+                            <ProtectedRoute>
+                                <EditBlog />
                             </ProtectedRoute>
                         }
                     />

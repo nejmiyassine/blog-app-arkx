@@ -39,6 +39,7 @@ require('./config/passport');
 
 // Static Assets
 app.use(express.static(path.join(__dirname, '/public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Create a middleware function for JWT authentication
 const authenticateJWT = passport.authenticate('jwt', { session: false });
@@ -49,7 +50,7 @@ const blogRouter = require('./routers/blog.router');
 
 // ---------- Routers ----------
 app.use('/users', userRouter);
-app.use('/blogs', blogRouter);
+app.use('/blogs', authenticateJWT, blogRouter);
 
 const PORT = process.env.PORT || 8000;
 

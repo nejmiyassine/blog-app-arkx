@@ -40,6 +40,7 @@ const Header = () => {
                                 width={24}
                                 height={24}
                             />
+                            <p>{state.user.username}</p>
                             <div>
                                 <button onClick={handleLogout}>Logout</button>
                             </div>

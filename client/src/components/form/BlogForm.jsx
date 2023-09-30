@@ -1,16 +1,46 @@
-import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { categories } from '../../data/categories';
-import {
-    fetchBlogs,
-    createBlog,
-    updateBlog,
-    deleteBlog,
-} from '../../api/blogsApi';
+import { fetchBlogById, createBlog, updateBlog } from '../../api/blogsApi';
 
-const BlogForm = () => {
+const BlogForm = ({ blogId }) => {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    const categories = [
+        {
+            id: 1,
+            value: 'fashion',
+            label: 'Fashion',
+        },
+        {
+            id: 2,
+            value: 'programming',
+            label: 'Programming',
+        },
+        {
+            id: 3,
+            value: 'self-improvement',
+            label: 'Self Improvement',
+        },
+        {
+            id: 4,
+            value: 'psychology',
+            label: 'Psychology',
+        },
+        {
+            id: 5,
+            value: 'productivity',
+            label: 'Productivity',
+        },
+        {
+            id: 6,
+            value: 'health',
+            label: 'Health',
+        },
+    ];
 
     const [formData, setFormData] = useState({
         title: '',
@@ -19,10 +49,14 @@ const BlogForm = () => {
     });
     const [image, setImage] = useState(null);
 
-    // Queries
-    const { data, isLoading, isError, error } = useQuery({
-        queryKey: ['blogs'],
-        queryFn: fetchBlogs,
+    const {
+        data: existingBlog,
+        isError,
+        error,
+    } = useQuery({
+        queryKey: ['blogs', blogId],
+        mutationFn: () => fetchBlogById(blogId),
+        enabled: !!blogId, // Only fetch when blogId is provided
     });
 
     // Mutations
@@ -40,28 +74,29 @@ const BlogForm = () => {
         },
     });
 
-    const deleteBlogMutation = useMutation({
-        mutationFn: deleteBlog,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['blogs'] });
-        },
-    });
-
     const handleCreateBlog = (newBlogData) =>
         createBlogMutation.mutate(newBlogData);
 
-    const handleUpdateBlog = (blogId, updatedBlogData) =>
-        updateBlogMutation.mutate({ id: blogId, updatedBlogData });
-
-    const handleDeleteBlog = (blogId) => {
-        if (window.confirm('Are you sure you want to delete this blog?')) {
-            deleteBlogMutation.mutate(blogId);
+    const handleUpdateBlog = (blogId, updatedBlogData) => {
+        if (blogId) {
+            updateBlogMutation.mutate(blogId, updatedBlogData);
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        handleCreateBlog(formData);
+        const blogData = { ...formData };
+
+        if (image) {
+            blogData.image = image;
+        }
+
+        if (blogId) {
+            handleUpdateBlog(blogData);
+        }
+
+        handleCreateBlog(blogData);
+        navigate('/');
     };
 
     const handleInputChange = (e) => {
@@ -72,30 +107,42 @@ const BlogForm = () => {
         });
     };
 
-    if (isLoading) return <p>Loading...</p>;
+    useEffect(() => {
+        if (existingBlog) {
+            setFormData({
+                title: existingBlog.title,
+                description: existingBlog.description,
+                category: existingBlog.category,
+            });
+        }
+    }, [existingBlog]);
 
     if (isError) return <p>{error.message}</p>;
 
     return (
         <div className='container mx-auto'>
-            <h2>Blog</h2>
             <form action='' onSubmit={handleSubmit}>
-                <div className='flex flex-col'>
+                {existingBlog && (
+                    <input type='hidden' name='id' value={existingBlog.id} />
+                )}
+
+                <div className='flex flex-col py-4'>
                     <label htmlFor='title'>Title:</label>
                     <input
+                        className='text-gray-700 dark:text-black'
                         type='text'
                         name='title'
                         id='title'
                         value={formData.title}
                         placeholder='Enter your title'
                         onChange={handleInputChange}
-                        className='text-gray-700 dark:text-black'
                         required
                     />
                 </div>
-                <div className='flex flex-col'>
+                <div className='flex flex-col py-4'>
                     <label htmlFor='description'>Description:</label>
                     <textarea
+                        className='text-gray-700 dark:text-black'
                         type='text'
                         name='description'
                         id='description'
@@ -105,31 +152,32 @@ const BlogForm = () => {
                         required
                     />
                 </div>
-                <div className='flex flex-col'>
+                <div className='flex flex-col py-4'>
                     <label htmlFor='category'>Category:</label>
                     <select
+                        className='text-gray-700 dark:text-black'
+                        id='category'
                         name='category'
-                        id='categort'
                         value={formData.category}
                         onChange={handleInputChange}
                         required
                     >
-                        {categories &&
-                            categories.map(({ id, value, label }) => {
-                                <option key={id} value={value} selected>
-                                    {label}
-                                </option>;
-                            })}
+                        <option value=''>Select an option</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.value}>
+                                {category.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
-                <div className='flex flex-col'>
+                <div className='flex flex-col py-4'>
                     <label htmlFor='image'>Select images to upload:</label>
                     <input
                         type='file'
                         name='image'
                         id='image'
                         value={formData.image}
-                        onChange={handleInputChange}
+                        onChange={(e) => setImage(e.target.files[0])}
                     />
                 </div>
                 <div>
@@ -138,6 +186,10 @@ const BlogForm = () => {
             </form>
         </div>
     );
+};
+
+BlogForm.propTypes = {
+    blogId: PropTypes.string,
 };
 
 export default BlogForm;

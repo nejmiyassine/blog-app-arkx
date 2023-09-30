@@ -4,7 +4,11 @@ const { body } = require('express-validator');
 const passport = require('passport');
 
 const User = require('../models/User');
-const { registerUser, loginUser } = require('../controllers/user.controller');
+const {
+    registerUser,
+    loginUser,
+    getUserBlogs,
+} = require('../controllers/user.controller');
 
 const validate = require('../helpers/validate');
 
@@ -60,6 +64,8 @@ router.get(
         res.json({ user: req.user });
     }
 );
+
+router.get('/:userId/blogs', getUserBlogs);
 
 router.get('/logout', (req, res) => {
     req.logout();
