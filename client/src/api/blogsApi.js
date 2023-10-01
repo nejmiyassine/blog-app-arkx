@@ -56,16 +56,22 @@ export const createBlog = async (newBlogData) => {
 
 export const updateBlog = async (blogId, updatedBlogData) => {
     try {
-        console.log(blogId, updatedBlogData);
+        console.log('updateBlog called with blogId:', blogId);
+        console.log('updateBlog called with updatedBlogData:', updatedBlogData);
+        console.log('URL:', `${apiUrl}/blogs/${blogId}`);
+
         const response = await axios.put(
             `${apiUrl}/blogs/${blogId}`,
             updatedBlogData,
             {
                 headers: {
+                    'Content-Type': 'multipart/form-data',
                     Authorization: `${token}`,
                 },
             }
         );
+        console.log('Request:', response.config);
+        console.log('Response:', response.data);
         return response.data;
     } catch (error) {
         console.error(error.message);

@@ -40,6 +40,11 @@ const BlogForm = ({ blogId }) => {
             value: 'health',
             label: 'Health',
         },
+        {
+            id: 7,
+            value: 'sport',
+            label: 'Sport',
+        },
     ];
 
     const [formData, setFormData] = useState({
@@ -55,7 +60,7 @@ const BlogForm = ({ blogId }) => {
         error,
     } = useQuery({
         queryKey: ['blogs', blogId],
-        mutationFn: () => fetchBlogById(blogId),
+        queryFn: () => fetchBlogById(blogId),
         enabled: !!blogId, // Only fetch when blogId is provided
     });
 
@@ -92,10 +97,14 @@ const BlogForm = ({ blogId }) => {
         }
 
         if (blogId) {
-            handleUpdateBlog(blogData);
+            console.log('Blog Id: ', blogId);
+            console.log('Blog data: ', blogData);
+            handleUpdateBlog(blogId, blogData);
         }
 
-        handleCreateBlog(blogData);
+        if (!blogId) {
+            handleCreateBlog(blogData);
+        }
         navigate('/');
     };
 
