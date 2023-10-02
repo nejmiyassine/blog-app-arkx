@@ -10,9 +10,9 @@ import {
     TablePagination,
     Paper,
 } from '@mui/material';
+import { sliceText } from '../utils/sliceText';
 
-import { AiFillEdit } from 'react-icons/ai';
-import { MdDelete } from 'react-icons/md';
+import { MdModeEdit, MdDelete } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -49,13 +49,21 @@ const DataTable = ({ data }) => {
     return (
         <div>
             <TableContainer component={Paper}>
-                <Table>
+                <Table className='dark:bg-[#444]'>
                     <TableHead>
                         <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>Title</TableCell>
-                            <TableCell>Description</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell className='dark:text-white'>
+                                ID
+                            </TableCell>
+                            <TableCell className='dark:text-white'>
+                                Title
+                            </TableCell>
+                            <TableCell className='dark:text-white'>
+                                Description
+                            </TableCell>
+                            <TableCell className='dark:text-white'>
+                                Actions
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -66,21 +74,27 @@ const DataTable = ({ data }) => {
                             )
                             .map((blog) => (
                                 <TableRow key={blog._id}>
-                                    <TableCell>{blog._id}</TableCell>
-                                    <TableCell>{blog.title}</TableCell>
-                                    <TableCell>{blog.description}</TableCell>
-                                    <TableCell>
+                                    <TableCell className='dark:text-white'>
+                                        {blog._id}
+                                    </TableCell>
+                                    <TableCell className='dark:text-white'>
+                                        {blog.title}
+                                    </TableCell>
+                                    <TableCell className='dark:text-white'>
+                                        {sliceText(blog.description, 200)}
+                                    </TableCell>
+                                    <TableCell className='dark:text-white'>
                                         <div className='flex gap-6'>
                                             <Link to={`/edit-blog/${blog._id}`}>
-                                                <AiFillEdit
+                                                <MdModeEdit
                                                     className='cursor-pointer'
-                                                    size={24}
+                                                    size={20}
                                                     color={'#00ff00'}
                                                 />
                                             </Link>
                                             <MdDelete
                                                 className='cursor-pointer'
-                                                size={24}
+                                                size={20}
                                                 color={'#ff0000'}
                                                 onClick={() =>
                                                     handleDeleteBlog(blog._id)
@@ -101,6 +115,7 @@ const DataTable = ({ data }) => {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
+                className='dark:text-white'
             />
         </div>
     );

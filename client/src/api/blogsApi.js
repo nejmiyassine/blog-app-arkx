@@ -41,13 +41,16 @@ export const fetchUserBlogs = async (userId) => {
 };
 
 export const createBlog = async (newBlogData) => {
+    console.log(newBlogData);
     try {
+        console.log(`${apiUrl}/blogs`);
         const response = await axios.post(`${apiUrl}/blogs`, newBlogData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 Authorization: `${token}`,
             },
         });
+        console.log('response: ', response.data);
         return response.data;
     } catch (error) {
         console.error(error.message);
@@ -58,7 +61,6 @@ export const updateBlog = async (blogId, updatedBlogData) => {
     try {
         console.log('updateBlog called with blogId:', blogId);
         console.log('updateBlog called with updatedBlogData:', updatedBlogData);
-        console.log('URL:', `${apiUrl}/blogs/${blogId}`);
 
         const response = await axios.put(
             `${apiUrl}/blogs/${blogId}`,
@@ -70,11 +72,10 @@ export const updateBlog = async (blogId, updatedBlogData) => {
                 },
             }
         );
-        console.log('Request:', response.config);
-        console.log('Response:', response.data);
+
         return response.data;
     } catch (error) {
-        console.error(error.message);
+        throw new Error(error.response.data);
     }
 };
 

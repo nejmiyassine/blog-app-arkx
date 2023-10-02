@@ -1,9 +1,14 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
 import { fetchBlogs } from '../api/blogsApi';
+import { imageUrl } from '../utils/imageUrl';
+import { categories } from '../data/categories';
+
+import BlogCard from './BlogCard';
+import Container from './Container';
+import CategoryFilter from './CategoryFilter';
 
 const Blogs = () => {
     const { state } = useAuth();
@@ -12,10 +17,7 @@ const Blogs = () => {
         queryKey: ['blogs'],
         queryFn: fetchBlogs,
     });
-
-    const basePath = 'http://localhost:8000';
-    const imageUrl = (imagePath) =>
-        `${basePath}/${imagePath.replace(/\\/g, '/')}`;
+    const blogs = data;
 
     useEffect(() => {
         fetchBlogs();
@@ -25,40 +27,46 @@ const Blogs = () => {
 
     if (isError) return <p>{error.message}</p>;
 
-    return state.user ? (
-        <div className=''>
-            {data &&
-                data.map((blog) => (
-                    <div key={blog._id} className='flex py-4 gap-10'>
-                        <div>
-                            <img
-                                className='w-44'
-                                src={`${imageUrl(blog.image)}`}
-                                alt={blog.title}
-                            />
-                        </div>
-                        <div>
-                            <div>
-                                <h2 className='font-bold text-4xl pb-4 hover:underline hover:underline-offset-8'>
-                                    <Link to={`/blog/${blog._id}`}>
-                                        {blog.title}
-                                    </Link>
-                                </h2>
-                            </div>
-                            <div className='pb-4'>
-                                <p>{blog.description}</p>
-                            </div>
-                            <div>
-                                <span>{blog.category}</span>
-                            </div>
-                        </div>
+    return (
+        state.user && (
+            <Container>
+                <section className='pb-8'>
+                    <h2 className='text-3xl font-bold pt-12 text-center capitalize'>
+                        Popular Topics
+                    </h2>
+                    <div className='flex items-center justify-between mt-8 mb-4'>
+                        <ul className='flex gap-4 items-center'>
+                            {categories.map((category) => (
+                                <CategoryFilter
+                                    key={category.id}
+                                    label={category.label}
+                                />
+                            ))}
+                        </ul>
+                        <button className='border text-sm rounded-lg p-2'>
+                            View all
+                        </button>
                     </div>
-                ))}
-        </div>
-    ) : (
-        <div>
-            <h2>not Authorized</h2>
-        </div>
+
+                    <div className='grid grid-cols-3 gap-10'>
+                        {blogs &&
+                            blogs
+                                .slice(0, 6)
+                                .map((blog) => (
+                                    <BlogCard
+                                        key={blog._id}
+                                        id={blog._id}
+                                        image={imageUrl(blog.image)}
+                                        title={blog.title}
+                                        description={blog.description}
+                                        category={blog.category}
+                                        date={blog.createdAt}
+                                    />
+                                ))}
+                    </div>
+                </section>
+            </Container>
+        )
     );
 };
 

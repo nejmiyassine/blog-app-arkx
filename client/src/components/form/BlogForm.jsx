@@ -1,51 +1,16 @@
 import PropTypes from 'prop-types';
+import { AiFillFileImage } from 'react-icons/ai';
+import { FaPaperPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { categories } from '../../data/categories';
 import { fetchBlogById, createBlog, updateBlog } from '../../api/blogsApi';
 
 const BlogForm = ({ blogId }) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-
-    const categories = [
-        {
-            id: 1,
-            value: 'fashion',
-            label: 'Fashion',
-        },
-        {
-            id: 2,
-            value: 'programming',
-            label: 'Programming',
-        },
-        {
-            id: 3,
-            value: 'self-improvement',
-            label: 'Self Improvement',
-        },
-        {
-            id: 4,
-            value: 'psychology',
-            label: 'Psychology',
-        },
-        {
-            id: 5,
-            value: 'productivity',
-            label: 'Productivity',
-        },
-        {
-            id: 6,
-            value: 'health',
-            label: 'Health',
-        },
-        {
-            id: 7,
-            value: 'sport',
-            label: 'Sport',
-        },
-    ];
 
     const [formData, setFormData] = useState({
         title: '',
@@ -84,28 +49,29 @@ const BlogForm = ({ blogId }) => {
 
     const handleUpdateBlog = (blogId, updatedBlogData) => {
         if (blogId) {
-            updateBlogMutation.mutate(blogId, updatedBlogData);
+            updateBlogMutation.mutateAsync(blogId, updatedBlogData);
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const blogData = { ...formData };
+    const handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
+            const blogData = { ...formData };
 
-        if (image) {
-            blogData.image = image;
-        }
+            if (image) {
+                blogData.image = image;
+            }
 
-        if (blogId) {
-            console.log('Blog Id: ', blogId);
-            console.log('Blog data: ', blogData);
-            handleUpdateBlog(blogId, blogData);
-        }
+            if (blogId) {
+                handleUpdateBlog(blogId, blogData);
+            }
 
-        if (!blogId) {
             handleCreateBlog(blogData);
+
+            navigate('/');
+        } catch (error) {
+            console.error('Error updating blog:', error);
         }
-        navigate('/');
     };
 
     const handleInputChange = (e) => {
@@ -129,7 +95,7 @@ const BlogForm = ({ blogId }) => {
     if (isError) return <p>{error.message}</p>;
 
     return (
-        <div className='container mx-auto'>
+        <div className='min-h-screen'>
             <form action='' onSubmit={handleSubmit}>
                 {existingBlog && (
                     <input type='hidden' name='id' value={existingBlog.id} />
@@ -138,7 +104,7 @@ const BlogForm = ({ blogId }) => {
                 <div className='flex flex-col py-4'>
                     <label htmlFor='title'>Title:</label>
                     <input
-                        className='text-gray-700 dark:text-black'
+                        className='text-gray-700 dark:text-white bg-white dark:bg-[#444] border-2 border-black p-2 rounded-sm dark:border-gray-300 focus:outline-blue-600'
                         type='text'
                         name='title'
                         id='title'
@@ -151,7 +117,7 @@ const BlogForm = ({ blogId }) => {
                 <div className='flex flex-col py-4'>
                     <label htmlFor='description'>Description:</label>
                     <textarea
-                        className='text-gray-700 dark:text-black'
+                        className='w-full h-40 text-gray-700 dark:text-white bg-white dark:bg-[#444] border-2 border-black p-2 rounded-sm dark:border-gray-300 focus:outline-blue-600'
                         type='text'
                         name='description'
                         id='description'
@@ -164,7 +130,7 @@ const BlogForm = ({ blogId }) => {
                 <div className='flex flex-col py-4'>
                     <label htmlFor='category'>Category:</label>
                     <select
-                        className='text-gray-700 dark:text-black'
+                        className='text-gray-700 dark:text-black text-gray-700 p-2 dark:text-white bg-white dark:bg-[#444]  border-2 border-black rounded-sm dark:border-gray-300 focus:outline-blue-600'
                         id='category'
                         name='category'
                         value={formData.category}
@@ -179,18 +145,32 @@ const BlogForm = ({ blogId }) => {
                         ))}
                     </select>
                 </div>
-                <div className='flex flex-col py-4'>
-                    <label htmlFor='image'>Select images to upload:</label>
-                    <input
-                        type='file'
-                        name='image'
-                        id='image'
-                        value={formData.image}
-                        onChange={(e) => setImage(e.target.files[0])}
-                    />
+                <div className='flex items-center h-20'>
+                    <label
+                        htmlFor='image'
+                        className='cursor-pointer relative bg-indigo-600 text-white py-4 px-4 rounded-lg shadow-lg'
+                    >
+                        <span className='absolute top-0 left-0 right-0 bottom-0 opacity-0 z-10 cursor-pointer'></span>
+                        <span className='flex items-center gap-2'>
+                            Upload Image <AiFillFileImage />
+                        </span>
+                        <input
+                            className='absolute inset-0 opacity-0 z-20'
+                            type='file'
+                            name='image'
+                            id='image'
+                            value={formData.image}
+                            onChange={(e) => setImage(e.target.files[0])}
+                        />
+                    </label>
                 </div>
                 <div>
-                    <button type='submit'>Submit</button>
+                    <button
+                        className='mt-4 bg-blue-600 text-white font-semibold p-4 rounded-lg flex items-center gap-2'
+                        type='submit'
+                    >
+                        Submit <FaPaperPlane />
+                    </button>
                 </div>
             </form>
         </div>
