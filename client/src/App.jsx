@@ -11,6 +11,7 @@ import CreateBlog from './pages/CreateBlog/CreateBlog';
 import EditBlog from './pages/EditBlog/EditBlog';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home/Home';
+import AllBlogs from './pages/AllBlogs/AllBlogs';
 
 const App = () => {
     const { state } = useAuth();
@@ -69,6 +70,7 @@ const App = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route path='/' element={<AllBlogs />} />
                 <Route path='*' element={<ErrorElement />} />
             </Routes>
         </BrowserRouter>

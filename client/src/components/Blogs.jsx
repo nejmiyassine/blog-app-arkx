@@ -9,6 +9,7 @@ import { categories } from '../data/categories';
 import BlogCard from './BlogCard';
 import Container from './Container';
 import CategoryFilter from './CategoryFilter';
+import { Link } from 'react-router-dom';
 
 const Blogs = () => {
     const { state } = useAuth();
@@ -21,7 +22,7 @@ const Blogs = () => {
 
     useEffect(() => {
         fetchBlogs();
-    }, []);
+    }, [data]);
 
     if (isLoading) return <p>Loading ...</p>;
 
@@ -44,7 +45,7 @@ const Blogs = () => {
                             ))}
                         </ul>
                         <button className='border text-sm rounded-lg p-2'>
-                            View all
+                            <Link to='/view-all'>View all</Link>
                         </button>
                     </div>
 

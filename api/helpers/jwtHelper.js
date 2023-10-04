@@ -13,7 +13,7 @@ const issueJWT = (user) => {
 
     // Generate a JWT token
     const token = jwt.sign(payload, secretKey, {
-        expiresIn: '1d',
+        expiresIn,
     });
 
     return {

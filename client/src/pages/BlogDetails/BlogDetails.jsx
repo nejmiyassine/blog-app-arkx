@@ -76,6 +76,9 @@ const BlogDetails = () => {
                     <p className='leading-10'>{data.description}</p>
                 </div>
             </div>
+            <div className="w-1/3">
+                
+            </div>
         </Container>
     );
 };
